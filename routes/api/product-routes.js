@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const { UPSERT } = require('sequelize/types/lib/query-types');
 const { Product, Category, Tag, ProductTag } = require('../../models');
 const { findAll } = require('../../models/Product');
 
@@ -33,7 +32,7 @@ router.get('/:id', async (req, res) => {
     res.status(200).json(productData);
 
     if (!productData) {
-      res.status(400).json({ message: 'No user with this id!' });
+      res.status(400).json({ message: 'No product with this id!' });
       return;
     }
 
@@ -119,20 +118,20 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', async (req, res) => {
 
   try {
-  const productData = await Product.destroy({
-    where: {
+    const productData = await Product.destroy({
+      where: {
         // delete one product by its `id` value
-      id: req.body.id,
-    },
-  })
-  if (!productData) {
-    res.status(404).json({ message: 'No user with this id!' });
-    return;
+        id: req.body.id,
+      },
+    })
+    if (!productData) {
+      res.status(404).json({ message: 'No user with this id!' });
+      return;
+    }
+    res.status(400).json({ message: 'Selected Product was deleted' });
+  } catch (err) {
+    res.status(500).json(err);
   }
-  res.status(400).json({ message: 'Selected Product was deleted' });
-} catch (err) {
-  res.status(500).json(err);
-}
 });
 
 module.exports = router;
