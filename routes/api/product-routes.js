@@ -1,18 +1,45 @@
 const router = require('express').Router();
+const { UPSERT } = require('sequelize/types/lib/query-types');
 const { Product, Category, Tag, ProductTag } = require('../../models');
+const { findAll } = require('../../models/Product');
 
 // The `/api/products` endpoint
 
 // get all products
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   // find all products
-  // be sure to include its associated Category and Tag data
+  try {
+    const productData = await Product.findAll({
+      // be sure to include its associated Category and Tag data
+      include: Tag, Category,
+      through: ProductTag,
+    })
+    res.status(200).json(productData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+
 });
 
 // get one product
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+  try {
+    const productData = await Product.findByPk(req.params.id, {
+      // be sure to include its associated Category and Tag data
+      include: Tag, Category,
+      through: ProductTag,
+    })
+    res.status(200).json(productData);
+
+    if (!productData) {
+      res.status(400).json({ message: 'No user with this id!' });
+      return;
+    }
+
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 // create new product
@@ -89,8 +116,23 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
-  // delete one product by its `id` value
+router.delete('/:id', async (req, res) => {
+
+  try {
+  const productData = await Product.destroy({
+    where: {
+        // delete one product by its `id` value
+      id: req.body.id,
+    },
+  })
+  if (!productData) {
+    res.status(404).json({ message: 'No user with this id!' });
+    return;
+  }
+  res.status(400).json({ message: 'Selected Product was deleted' });
+} catch (err) {
+  res.status(500).json(err);
+}
 });
 
 module.exports = router;
