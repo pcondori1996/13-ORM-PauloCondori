@@ -31,7 +31,9 @@ stock: {
   validate: { isNumeric: true}
 },
 category_id: {
-  
+  type: DataTypes.INTEGER,
+  model: 'category',
+  key: 'id'
 }
     // define columns
   },
@@ -45,3 +47,4 @@ category_id: {
 );
 
 module.exports = Product;
+// 13-ORM-PauloCondori/models/Product.js
